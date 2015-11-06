@@ -14,18 +14,27 @@ public class Main {
         {
             Socket clientSocket = new Socket("192.168.0.48", 5000);
             ServerSocket socket = new ServerSocket(5000);
-            PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
-            BufferedReader response = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+
+            SendMessages sm = new SendMessages(clientSocket);
+            ReceiveMessages rm = new ReceiveMessages(clientSocket);
+
+           // PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
+            //BufferedReader response = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 
             if (clientSocket.isConnected() )
             {
                 System.out.println("Connected");
                 System.out.println("HeRE");
-                out.println("HELO");
-                System.out.println("echo: " + response.readLine());
-                out.flush();
-                response.close();
-                out.close();
+                //out.println("HELO");
+                //System.out.println("echo: " + response.readLine());
+                //out.flush();
+                //response.close();
+               // out.close();
+                Thread t1 = new Thread(rm);
+                Thread t2 = new Thread (sm);
+
+                t1.start();
+                t2.start();
             }
             else
                 System.out.println("ERROR");
