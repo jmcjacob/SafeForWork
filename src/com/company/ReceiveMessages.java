@@ -21,7 +21,7 @@ public class ReceiveMessages extends Thread
     public void run()
     {
         System.out.println("Receive Messages Thread:");
-
+        System.out.println(s);
         try {
             PrintWriter out = new PrintWriter(s.getOutputStream(), true);
             out.println("HELO");
@@ -33,7 +33,7 @@ public class ReceiveMessages extends Thread
         }
         catch (Exception e)
         {
-            System.out.println(e);
+            System.out.println("Receive: " + e);
         }
    }
 }

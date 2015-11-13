@@ -28,7 +28,6 @@ public class Register extends Thread
             PrintWriter out = new PrintWriter(s.getOutputStream(), true);
             out.println("REGI");
 
-
             //Need to exit the connection by sending "EXIT" to notify the server.
 
             out.flush();
@@ -36,7 +35,7 @@ public class Register extends Thread
         }
         catch (Exception e)
         {
-            System.out.println(e);
+            System.out.println("Register: " + e);
         }
     }
 }
