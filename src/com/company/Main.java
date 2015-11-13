@@ -35,6 +35,8 @@ public class Main {
 
                 t1.start();
                 t2.start();
+                t2.run();
+                t1.run();
             }
             else
                 System.out.println("ERROR");
