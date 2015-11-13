@@ -35,13 +35,13 @@ public class Main {
 
                 t1.start();
                 t2.start();
-                t2.run();
                 t1.run();
+                t2.run();
             }
             else
                 System.out.println("ERROR");
 
-            System.out.println("Eended");
+            System.out.println("Ended");
             clientSocket.close();
         }
         catch (Exception exception)
