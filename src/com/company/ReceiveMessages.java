@@ -12,21 +12,19 @@ import java.nio.CharBuffer;
 public class ReceiveMessages extends Thread
 {
     private Socket s;
+    private String m;
 
-    public ReceiveMessages(Socket _Socket)
+    public ReceiveMessages(Socket _Socket, String _m)
     {
         this.s = _Socket;
+        this.m = _m;
     }
 
     public void run()
     {
-        System.out.println("\nReceive Messages Thread:");
-        System.out.println(s);
         try {
             PrintWriter out = new PrintWriter(s.getOutputStream(), true);
-            out.println("HELO");
-
-            //Need to exit the connection by sending "EXIT" to notify the server.
+            out.println(m);
 
             out.flush();
             //out.close();

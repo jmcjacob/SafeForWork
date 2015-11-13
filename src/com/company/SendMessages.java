@@ -11,6 +11,7 @@ import java.nio.CharBuffer;
 public class SendMessages extends Thread
 {
     private Socket s;
+    public String reply;
 
     public SendMessages(Socket _Socket)
     {
@@ -19,11 +20,9 @@ public class SendMessages extends Thread
 
     public void run()
     {
-        System.out.println("\nSend Messages Thread:");
-
         try {
             BufferedReader response = new BufferedReader(new InputStreamReader(s.getInputStream()));
-            System.out.println("echo: " + response.readLine());
+            reply = "Reply: " + response.readLine();
             //response.close();
         }
 
