@@ -25,19 +25,8 @@ public class Main {
             if (clientSocket.isConnected() )
             {
                 System.out.println("Connected");
-                //out.println("HELO");
-                //System.out.println("echo: " + response.readLine());
-                //out.flush();
-                //response.close();
-               // out.close();
-                Thread t1 = new Thread(send);
-                Thread t2 = new Thread(receive);
-                Thread t3 = new Thread(register);
-
-                t1.start(); t2.start(); t3.start();
-                //t3.run();
-                //t1.run();
-                //t2.run();
+                receive.run();
+                send.run();
             }
             else
                 System.out.println("ERROR");
