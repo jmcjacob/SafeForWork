@@ -27,6 +27,8 @@ public class Main {
                 System.out.println("Connected");
                 receive.run();
                 send.run();
+                register.run();
+                send.run();
             }
             else
                 System.out.println("ERROR");

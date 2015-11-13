@@ -19,7 +19,7 @@ public class SendMessages extends Thread
 
     public void run()
     {
-        System.out.println("Send Messages Thread:");
+        System.out.println("\nSend Messages Thread:");
 
         try {
             BufferedReader response = new BufferedReader(new InputStreamReader(s.getInputStream()));

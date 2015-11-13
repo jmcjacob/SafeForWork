@@ -23,15 +23,11 @@ public class Register extends Thread
 
     public void run()
     {
-        System.out.println("Register Thread:");
+        System.out.println("\nRegister Thread:");
         try {
             PrintWriter out = new PrintWriter(s.getOutputStream(), true);
             out.println("REGI");
-
-            //Need to exit the connection by sending "EXIT" to notify the server.
-
             out.flush();
-            out.close();
         }
         catch (Exception e)
         {

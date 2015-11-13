@@ -20,7 +20,7 @@ public class ReceiveMessages extends Thread
 
     public void run()
     {
-        System.out.println("Receive Messages Thread:");
+        System.out.println("\nReceive Messages Thread:");
         System.out.println(s);
         try {
             PrintWriter out = new PrintWriter(s.getOutputStream(), true);
