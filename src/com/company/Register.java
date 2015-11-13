@@ -1,30 +1,33 @@
 package com.company;
 
+import java.io.PrintWriter;
+import java.net.Socket;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.net.*;
 import java.nio.CharBuffer;
+
 /**
- * Created by Computing on 06/11/2015.
+ * Created by Computing on 13/11/2015.
  */
-public class ReceiveMessages extends Thread
+public class Register extends Thread
 {
     private Socket s;
 
-    public ReceiveMessages(Socket _Socket)
+    public Register(Socket _Socket)
     {
         this.s = _Socket;
     }
 
     public void run()
     {
-        System.out.println("Receive Messages Thread:");
-
+        System.out.println("Register Thread:");
         try {
             PrintWriter out = new PrintWriter(s.getOutputStream(), true);
-            out.println("HELO");
+            out.println("REGI");
+
 
             //Need to exit the connection by sending "EXIT" to notify the server.
 
@@ -35,5 +38,5 @@ public class ReceiveMessages extends Thread
         {
             System.out.println(e);
         }
-   }
+    }
 }

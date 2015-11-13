@@ -15,8 +15,9 @@ public class Main {
             Socket clientSocket = new Socket("192.168.0.48", 5000);
             ServerSocket socket = new ServerSocket(5000);
 
-            SendMessages sm = new SendMessages(clientSocket);
-            ReceiveMessages rm = new ReceiveMessages(clientSocket);
+            SendMessages send = new SendMessages(clientSocket);
+            ReceiveMessages receive = new ReceiveMessages(clientSocket);
+            Register register = new Register(clientSocket);
 
            // PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
             //BufferedReader response = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
@@ -24,19 +25,19 @@ public class Main {
             if (clientSocket.isConnected() )
             {
                 System.out.println("Connected");
-                System.out.println("HeRE");
                 //out.println("HELO");
                 //System.out.println("echo: " + response.readLine());
                 //out.flush();
                 //response.close();
                // out.close();
-                Thread t1 = new Thread(rm);
-                Thread t2 = new Thread (sm);
+                Thread t1 = new Thread(send);
+                Thread t2 = new Thread(receive);
+                Thread t3 = new Thread(register);
 
-                t1.start();
-                t2.start();
-                t1.run();
-                t2.run();
+                t1.start(); t2.start(); t3.start();
+                //t3.run();
+                //t1.run();
+                //t2.run();
             }
             else
                 System.out.println("ERROR");
