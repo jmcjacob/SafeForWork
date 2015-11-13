@@ -22,11 +22,9 @@ public class SendMessages extends Thread
         System.out.println("Send Messages Thread:");
 
         try {
-            PrintWriter out = new PrintWriter(s.getOutputStream(), true);
             BufferedReader response = new BufferedReader(new InputStreamReader(s.getInputStream()));
-            out.println("REGI");
             System.out.println("echo: " + response.readLine());
-            response.close();
+            //response.close();
         }
 
         catch (Exception e)

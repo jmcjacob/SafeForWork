@@ -29,7 +29,7 @@ public class ReceiveMessages extends Thread
             //Need to exit the connection by sending "EXIT" to notify the server.
 
             out.flush();
-            out.close();
+            //out.close();
         }
         catch (Exception e)
         {
