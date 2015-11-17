@@ -11,5 +11,7 @@ public class Main {
     public static void main(String[] args)
     {
         if (Facade.test()) System.out.println("MAIN: Yay, it does stuff.");
+        System.out.println(Facade.exit());
+        System.out.println(Facade.register());
     }
 }

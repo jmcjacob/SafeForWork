@@ -11,24 +11,26 @@ import java.nio.CharBuffer;
 public class SendMessages extends Thread
 {
     private Socket s;
-    public String reply;
+    private String m;
 
-    public SendMessages(Socket _Socket)
+    public SendMessages(Socket _Socket, String _m)
     {
         this.s = _Socket;
+        this.m = _m;
     }
 
     public void run()
     {
         try {
-            BufferedReader response = new BufferedReader(new InputStreamReader(s.getInputStream()));
-            reply = "Reply: " + response.readLine();
-            //response.close();
-        }
+            PrintWriter out = new PrintWriter(s.getOutputStream(), true);
+            out.println(m);
 
+            out.flush();
+            //out.close();
+        }
         catch (Exception e)
         {
-            System.out.println("Send: " + e);
+            System.out.println("Receive: " + e);
         }
     }
 }

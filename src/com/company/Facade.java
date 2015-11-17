@@ -15,38 +15,85 @@ public class Facade {
         {
             Socket clientSocket = new Socket("192.168.0.48", 5000);
 
-            SendMessages send = new SendMessages(clientSocket);
-            ReceiveMessages receive = new ReceiveMessages(clientSocket, "HELO");
+            SendMessages send = new SendMessages(clientSocket, "HELO");
+            ReceiveMessages receive = new ReceiveMessages(clientSocket);
 
             if (clientSocket.isConnected() )
             {
-                receive.run();
                 send.run();
+                receive.run();
             }
             else
                 System.out.println("Not Connected");
 
             clientSocket.close();
 
-            if (send.reply.isEmpty()) return false;
+            if (receive.reply.isEmpty()) return false;
             else return true;
         }
         catch (Exception exception)
         {
             System.out.println("ERROR: " + exception);
         }
-        return true;
+        return false;
     }
 
-    public static boolean exit()
-    {
+    public static String exit() {
         //EXIT
-        return true;
+        try {
+            Socket clientSocket = new Socket("192.168.0.48", 5000);
+            SendMessages send = new SendMessages(clientSocket, "EXIT");
+            ReceiveMessages receive = new ReceiveMessages(clientSocket);
+
+            if (clientSocket.isConnected()) {
+                send.run();
+                receive.run();
+            } else {
+                System.out.println("Not Connected");
+            }
+
+            clientSocket.close();
+
+            if (receive.reply.isEmpty()) {
+                return null;
+            }
+            else {
+                return receive.reply;
+            }
+        }
+        catch (Exception exception) {
+            System.out.println("ERROR: " + exception);
+        }
+        return null;
     }
 
-    public static boolean register()
+    public static String register()
     {
         //REGI
-        return true;
+        try {
+            Socket clientSocket = new Socket("192.168.0.48", 5000);
+            SendMessages send = new SendMessages(clientSocket, "REGI");
+            ReceiveMessages receive = new ReceiveMessages(clientSocket);
+
+            if (clientSocket.isConnected()) {
+                send.run();
+                receive.run();
+            } else {
+                System.out.println("Not Connected");
+            }
+
+            clientSocket.close();
+
+            if (receive.reply.isEmpty()) {
+                return null;
+            }
+            else {
+                return receive.reply;
+            }
+        }
+        catch (Exception exception) {
+            System.out.println("ERROR: " + exception);
+        }
+        return null;
     }
 }
