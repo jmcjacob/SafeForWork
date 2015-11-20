@@ -12,6 +12,7 @@ public class Main {
     {
         if (Facade.test()) System.out.println("MAIN: Yay, it does stuff.");
         System.out.println(Facade.exit());
-        System.out.println(Facade.register());
+        Facade.register();
+        System.out.println(Facade.id);
     }
 }

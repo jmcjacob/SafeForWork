@@ -69,7 +69,7 @@ public class Facade {
         return null;
     }
 
-    public static String register()
+    public static void register()
     {
         //REGI
         try {
@@ -87,18 +87,16 @@ public class Facade {
             clientSocket.close();
 
             if (receive.reply.isEmpty()) {
-                return null;
+                return;
             }
             else {
-                id = receive.reply.substring(receive.reply.lastIndexOf(':') + 1);
-                System.out.println("Your Registration ID: " + id);
-                return receive.reply;
+                Facade.id = receive.reply.substring(receive.reply.lastIndexOf(':') + 1);
             }
         }
         catch (Exception exception) {
             System.out.println("ERROR: " + exception);
         }
-        return null;
+        return;
     }
 
     public static String buy() {
