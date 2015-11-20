@@ -8,6 +8,8 @@ import java.net.Socket;
  */
 public class Facade {
 
+    static String id = null;
+
     public static boolean test()
     {
         //HELO
@@ -88,12 +90,29 @@ public class Facade {
                 return null;
             }
             else {
+                id = receive.reply.substring(receive.reply.lastIndexOf(':') + 1);
+                System.out.println("Your Registration ID: " + id);
                 return receive.reply;
             }
         }
         catch (Exception exception) {
             System.out.println("ERROR: " + exception);
         }
+        return null;
+    }
+
+    public static String buy() {
+        //BUY
+        return null;
+    }
+
+    public static String sell() {
+        //SELL
+        return null;
+    }
+
+    public static String display() {
+        //DISP
         return null;
     }
 }
