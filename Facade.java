@@ -100,7 +100,19 @@ public class Facade {
     }
 
     public static String buy() {
-        //BUY
+        try {
+            Socket clientSocket = new Socket("192.168.0.48", 5000);
+            BuyStock buy = new BuyStock(clientSocket);
+
+            if (clientSocket.isConnected()) {
+                buy.run();
+            } else {
+                System.out.println("Not Connected");
+            }
+        }
+        catch (Exception exception) {
+            System.out.println("ERROR: " + exception);
+        }
         return null;
     }
 
