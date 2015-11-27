@@ -10,9 +10,10 @@ public class Main {
 
     public static void main(String[] args)
     {
-        if (Facade.test()) System.out.println("MAIN: Yay, it does stuff.");
-        System.out.println(Facade.exit());
+        Facade.ip = "192.168.0.48";
+        if (Facade.test()){System.out.println("Works");};
         Facade.register();
         System.out.println(Facade.id);
+        System.out.println(Facade.display());
     }
 }
