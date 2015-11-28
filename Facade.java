@@ -1,30 +1,19 @@
 package com.company;
-
-import jdk.internal.org.objectweb.asm.tree.analysis.Value;
-
-import java.net.ServerSocket;
 import java.net.Socket;
 
-/**
- * Created by Computing on 13/11/2015.
- */
 public class Facade {
 
     public static String ip = null;
     static String id = null;
 
-    public static boolean test()
-    {
-        //HELO
+    public static boolean test() {
         try
         {
             Socket clientSocket = new Socket(Facade.ip, 5000);
-
             SendMessages send = new SendMessages(clientSocket, "HELO");
             ReceiveMessages receive = new ReceiveMessages(clientSocket);
 
-            if (clientSocket.isConnected() )
-            {
+            if (clientSocket.isConnected() ) {
                 send.run();
                 receive.run();
             }
@@ -36,15 +25,13 @@ public class Facade {
             if (receive.reply.isEmpty()) return false;
             else return true;
         }
-        catch (Exception exception)
-        {
+        catch (Exception exception) {
             System.out.println("ERROR: " + exception);
         }
         return false;
     }
 
     public static String exit() {
-        //EXIT
         try {
             Socket clientSocket = new Socket(Facade.ip, 5000);
             SendMessages send = new SendMessages(clientSocket, "EXIT");
@@ -72,8 +59,7 @@ public class Facade {
         return null;
     }
 
-    public static void register()
-    {
+    public static void register() {
         //REGI
         try {
             Socket clientSocket = new Socket(Facade.ip, 5000);
@@ -125,12 +111,10 @@ public class Facade {
     }
 
     public static String display() {
-        //DISP
         try {
             Socket clientSocket = new Socket(Facade.ip, 5000);
             SendMessages send = new SendMessages(clientSocket, "DISP:" + Facade.id);
-            ReceiveMessages receive = new ReceiveMessages(clientSocket, false);
-            //ReceiveMessages receive = new ReceiveMessages(clientSocket);
+            ReceiveMessages receive = new ReceiveMessages(clientSocket, true);
 
             if (clientSocket.isConnected()) {
                 send.run();

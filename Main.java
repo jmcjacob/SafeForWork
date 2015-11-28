@@ -8,12 +8,14 @@ import java.nio.CharBuffer;
 
 public class Main {
 
-    public static void main(String[] args)
-    {
-        Facade.ip = "192.168.0.48";
-        if (Facade.test()){System.out.println("Works");};
-        Facade.register();
-        System.out.println(Facade.id);
-        System.out.println(Facade.display());
+    public static void main(String[] args) {
+        Facade.ip = "192.168.0.3";
+        if (Facade.test()) {
+            Facade.register();
+            System.out.println(Facade.display());
+        }
+        else{
+            System.out.println("FAILED");
+        }
     }
 }

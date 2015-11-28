@@ -1,39 +1,30 @@
 package com.company;
-
-import com.sun.org.apache.xpath.internal.operations.Bool;
-
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.io.PrintStream;
-import java.io.PrintWriter;
 import java.net.*;
-import java.nio.CharBuffer;
-/**
- * Created by Computing on 06/11/2015.
- */
+
 public class ReceiveMessages extends Thread
 {
     private Socket s;
     public String reply = "";
-    public boolean end = true;
+    public boolean multiLine = false;
 
     public ReceiveMessages(Socket _Socket)
 {
     this.s = _Socket;
 }
-    public ReceiveMessages(Socket _Socket, Boolean _end)
-    {
+
+    public ReceiveMessages(Socket _Socket, Boolean _multiLine) {
         this.s = _Socket;
-        this.end = _end;
+        this.multiLine = _multiLine;
     }
 
-    public void run()
-    {
+    public void run() {
         try {
             BufferedReader response = new BufferedReader(new InputStreamReader(s.getInputStream()));
-            if (end)
+            if (!multiLine)
                 reply = "Reply: " + response.readLine() + "\n";
-            else {
+            else if(multiLine) {
                 do {
                     reply = reply + "Reply: " + response.readLine() + "\n";
                 }
@@ -41,8 +32,7 @@ public class ReceiveMessages extends Thread
             }
         }
 
-        catch (Exception e)
-        {
+        catch (Exception e) {
             System.out.println("Send: " + e);
         }
     }
