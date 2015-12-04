@@ -88,15 +88,27 @@ public class Facade {
         return;
     }
 
-    public static String buy() {
+    public static Boolean buy(String company, int Shares) {
         try {
-            Socket clientSocket = new Socket("192.168.0.48", 5000);
-            BuyStock buy = new BuyStock(clientSocket);
+            Socket clientSocket = new Socket(Facade.ip, 5000);
+            SendMessages send = new SendMessages(clientSocket, "BUY:" + company + ":" + String.valueOf(Shares) + ":" + Facade.id);
+            ReceiveMessages receive = new ReceiveMessages(clientSocket, true);
 
             if (clientSocket.isConnected()) {
-                buy.run();
+                send.run();
+                receive.run();
             } else {
                 System.out.println("Not Connected");
+            }
+
+            clientSocket.close();
+
+            if (receive.reply.startsWith("ACK:BOUGHT")) {
+                System.out.println(receive.reply);
+                return true;
+            }
+            else {
+                return false;
             }
         }
         catch (Exception exception) {
@@ -105,8 +117,32 @@ public class Facade {
         return null;
     }
 
-    public static String sell() {
-        //SELL
+    public static Boolean sell(String company, int Shares) {
+        try {
+            Socket clientSocket = new Socket(Facade.ip, 5000);
+            SendMessages send = new SendMessages(clientSocket, "BUY:" + company + ":" + String.valueOf(Shares) + ":" + Facade.id);
+            ReceiveMessages receive = new ReceiveMessages(clientSocket, true);
+
+            if (clientSocket.isConnected()) {
+                send.run();
+                receive.run();
+            } else {
+                System.out.println("Not Connected");
+            }
+
+            clientSocket.close();
+
+            if (receive.reply.startsWith("ACK:SELL")) {
+                System.out.println(receive.reply);
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+        catch (Exception exception) {
+            System.out.println("ERROR: " + exception);
+        }
         return null;
     }
 

@@ -9,10 +9,12 @@ import java.nio.CharBuffer;
 public class Main {
 
     public static void main(String[] args) {
-        Facade.ip = "192.168.0.3";
+        Facade.ip = "192.168.0.48";
         if (Facade.test()) {
             Facade.register();
             System.out.println(Facade.display());
+            Facade.buy("Google", 10);
+            Facade.buy("Google", 10);
         }
         else{
             System.out.println("FAILED");
