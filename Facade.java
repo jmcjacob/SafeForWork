@@ -1,6 +1,7 @@
 package com.company;
 import java.net.Socket;
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -9,11 +10,12 @@ public class Facade {
     static String id = null;
     static Socket clientSocket;
     static Double money = 0.0;
-    static List<Stock> stocks;
+    static List<Stock> stocks = new ArrayList<Stock>();
 
     public static boolean initiate(String ip) {
         try {
             clientSocket = new Socket(ip, 5000);
+            Facade.addMoney((double)clientSocket.getLocalPort());
             if (Facade.test(clientSocket)) {
                 if (register(clientSocket)) {
                     if (get(clientSocket)) {
@@ -30,14 +32,12 @@ public class Facade {
 
     public static boolean addMoney(Double cash) {
         money = money + cash;
-        System.out.println("Current Balance: " + NumberFormat.getCurrencyInstance(new Locale("en", "GB")).format(money));
         return true;
     }
 
     public static boolean takeMoney(Double cash) {
         if (money - cash >= 0.0) {
             money = money - cash;
-            System.out.println("Current Balance: " + NumberFormat.getCurrencyInstance(new Locale("en", "GB")).format(money));
             return true;
         }
         return false;
@@ -106,6 +106,7 @@ public class Facade {
                 return false;
             }
             else {
+                System.out.println(receive.reply);
                 Facade.id = receive.reply.substring(receive.reply.lastIndexOf(':') + 1);
                 Facade.id = Facade.id.replace("\n", "");
                 return true;
@@ -121,7 +122,7 @@ public class Facade {
         Facade.update(clientSocket);
         boolean comp = false;
         int index = 0;
-        for (int i = 0; i > stocks.size(); i++){
+        for (int i = 0; i < stocks.size(); i++){
             if (stocks.get(i).getName().equals(company) && stocks.get(i).getPrice()*Shares<=money) {
                 comp = true;
                 index = i;
@@ -141,7 +142,8 @@ public class Facade {
                 }
 
                 if (!receive.reply.isEmpty()) {
-                    Double value = Double.valueOf(receive.reply.split("@")[1]) * Shares;
+                    String[] things = receive.reply.split(":");
+                    Double value = Double.valueOf(things[things.length-1]);
                     if (money - value >= 0.0) {
                         takeMoney(value);
                         stocks.get(index).addOwned(Shares);
@@ -161,7 +163,7 @@ public class Facade {
         Facade.update(clientSocket);
         boolean comp = false;
         int index = 0;
-        for (int i = 0; i > stocks.size(); i++){
+        for (int i = 0; i < stocks.size(); i++){
             if (stocks.get(i).getName().equals(company) && stocks.get(i).getOwned()>=Shares) {
                 comp = true;
                 index = i;
@@ -181,7 +183,8 @@ public class Facade {
                 }
 
                 if (!receive.reply.isEmpty()) {
-                    Double value = Double.valueOf(receive.reply.split("@")[1]) * Shares;
+                    String[] things = receive.reply.split(":");
+                    Double value = Double.valueOf(things[things.length-1]);
                     addMoney(value);
                     if (stocks.get(index).takeOwned(Shares))
                         return true;
@@ -198,6 +201,7 @@ public class Facade {
 
     public static Boolean get(Socket clientSocket) {
         try {
+            System.out.println("ID: " + Facade.id);
             SendMessages send = new SendMessages(clientSocket, "DISP:" + Facade.id);
             ReceiveMessages receive = new ReceiveMessages(clientSocket, true);
 
@@ -209,13 +213,13 @@ public class Facade {
             }
             for (int i = 0; i < receive.replies.length; i++) {
                 String[] values = receive.replies[i].split(":");
-                stocks.add(new Stock(values[0], Double.valueOf(values[1]), Double.valueOf(values[2])));
+                stocks.add(new Stock(values[1], Double.valueOf(values[2]), Double.valueOf(values[3])));
             }
         }
         catch (Exception exception) {
             System.out.println("ERROR: " + exception);
         }
-        return false;
+        return true;
     }
 
     public static Boolean update(Socket clientSocket) {

@@ -25,8 +25,15 @@ public class ReceiveMessages extends Thread
     public void run() {
         try {
             BufferedReader response = new BufferedReader(new InputStreamReader(s.getInputStream()));
-            if (!multiLine)
-                reply = reply + response.readLine() + "\n";
+            if (!multiLine) {
+                String thing = response.readLine();
+                if (thing.isEmpty()) {
+                    reply = reply + response.readLine();
+                }
+                else{
+                    reply = reply + thing;
+                }
+            }
             else if(multiLine) {
                 int value = 0;
                 String stock = "";
@@ -35,7 +42,7 @@ public class ReceiveMessages extends Thread
                         String[] stocks = stock.split("\n");
                         if (stocks.length > 1) {
                             if (stocks[stocks.length-1].equals("END:EOF")) {
-                                replies = Arrays.copyOfRange(stocks,1,stocks.length-1);
+                                replies = Arrays.copyOfRange(stocks,1,stocks.length-2);
                                 return;
                             }
                         }
