@@ -1,4 +1,5 @@
 package com.company;
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.*;
@@ -7,7 +8,8 @@ import java.util.Arrays;
 public class ReceiveMessages extends Thread
 {
     private Socket s;
-    public String reply = "Reply: ";
+    public String reply = "";
+    public String[] replies;
     public boolean multiLine = false;
 
     public ReceiveMessages(Socket _Socket)
@@ -27,25 +29,24 @@ public class ReceiveMessages extends Thread
                 reply = reply + response.readLine() + "\n";
             else if(multiLine) {
                 int value = 0;
-                String thing = "";
+                String stock = "";
                 while ((value = response.read()) != -1) {
                     if ((char)value == '\n') {
-                        String[] things = thing.split("\n");
-                        if (things.length > 1) {
-                            if (things[things.length-1].equals("END:EOF")) {
-                                reply = Arrays.copyOfRange(things,1,things.length-1).toString();
+                        String[] stocks = stock.split("\n");
+                        if (stocks.length > 1) {
+                            if (stocks[stocks.length-1].equals("END:EOF")) {
+                                replies = Arrays.copyOfRange(stocks,1,stocks.length-1);
                                 return;
                             }
                         }
                     }
                     if ((char)value == '\r') {}
                     else {
-                        thing = thing + (char) value;
+                        stock = stock + (char) value;
                     }
                 }
             }
         }
-
         catch (Exception e) {
             System.out.println("Send: " + e);
         }
