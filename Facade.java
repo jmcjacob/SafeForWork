@@ -16,7 +16,9 @@ public class Facade {
             clientSocket = new Socket(ip, 5000);
             if (Facade.test(clientSocket)) {
                 if (register(clientSocket)) {
-                    return true;
+                    if (get(clientSocket)) {
+                        return true;
+                    }
                 }
             }
             return false;
@@ -116,7 +118,7 @@ public class Facade {
     }
 
     public static boolean buy(Socket clientSocket, String company, int Shares) {
-        Facade.display(clientSocket);
+        Facade.update(clientSocket);
         boolean comp = false;
         int index = 0;
         for (int i = 0; i > stocks.size(); i++){
@@ -156,7 +158,7 @@ public class Facade {
     }
 
     public static boolean sell(Socket clientSocket, String company, int Shares) {
-        Facade.display(clientSocket);
+        Facade.update(clientSocket);
         boolean comp = false;
         int index = 0;
         for (int i = 0; i > stocks.size(); i++){
@@ -194,7 +196,7 @@ public class Facade {
         return false;
     }
 
-    public static Boolean display(Socket clientSocket) {
+    public static Boolean get(Socket clientSocket) {
         try {
             SendMessages send = new SendMessages(clientSocket, "DISP:" + Facade.id);
             ReceiveMessages receive = new ReceiveMessages(clientSocket, true);
@@ -213,6 +215,53 @@ public class Facade {
         catch (Exception exception) {
             System.out.println("ERROR: " + exception);
         }
-        return null;
+        return false;
+    }
+
+    public static Boolean update(Socket clientSocket) {
+        try {
+            SendMessages send = new SendMessages(clientSocket, "DISP:" + Facade.id);
+            ReceiveMessages receive = new ReceiveMessages(clientSocket, true);
+
+            if (clientSocket.isConnected()) {
+                send.run();
+                receive.run();
+            } else {
+                System.out.println("Not Connected");
+            }
+            for (int i = 0; i < receive.replies.length; i++) {
+                String[] values = receive.replies[i].split(":");
+                for (int j = 0; j > stocks.size(); j++) {
+                    if (stocks.get(j).getName().equals(values[0])) {
+                        stocks.set(j, new Stock(values[0], Double.valueOf(values[1]), Double.valueOf(values[2]), stocks.get(j).getOwned()));
+                    }
+                }
+            }
+        }
+        catch (Exception exception) {
+            System.out.println("ERROR: " + exception);
+        }
+        return false;
+    }
+
+    public static boolean display() {
+        for (int i = 0; i < stocks.size(); i++) {
+            System.out.println(stocks.get(i).getName()+":"+stocks.get(i).getPrice()+":"+stocks.get(i).getChange()+":"+stocks.get(i).getOwned());
+        }
+        return true;
+    }
+
+    public static boolean displayMoney() {
+        System.out.println("Current Balance: " + NumberFormat.getCurrencyInstance(new Locale("en", "GB")).format(money));
+        return true;
+    }
+
+    public static boolean displayOwned() {
+        for (int i = 0; i < stocks.size(); i++) {
+            if (stocks.get(i).getOwned()>0) {
+                System.out.println(stocks.get(i).getName() + ":" + stocks.get(i).getPrice() + ":" + stocks.get(i).getChange() + ":" + stocks.get(i).getOwned());
+            }
+        }
+        return true;
     }
 }
