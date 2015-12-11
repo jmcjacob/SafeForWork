@@ -3,13 +3,26 @@ import java.net.Socket;
 
 public class Facade {
 
-    public static String ip = null;
     static String id = null;
+    static Socket clientSocket;
 
-    public static boolean test() {
-        try
-        {
-            Socket clientSocket = new Socket(Facade.ip, 5000);
+    public static boolean start(String ip) {
+        try {
+            clientSocket = new Socket(ip, 5000);
+            if (Facade.test(clientSocket)) {
+                if (register(clientSocket)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+        catch (Exception e) {
+            return false;
+        }
+    }
+
+    public static boolean test(Socket clientSocket) {
+        try {
             SendMessages send = new SendMessages(clientSocket, "HELO");
             ReceiveMessages receive = new ReceiveMessages(clientSocket);
 
@@ -20,8 +33,6 @@ public class Facade {
             else
                 System.out.println("Not Connected");
 
-            clientSocket.close();
-
             if (receive.reply.isEmpty()) return false;
             else return true;
         }
@@ -31,9 +42,8 @@ public class Facade {
         return false;
     }
 
-    public static String exit() {
+    public static boolean exit(Socket clientSocket) {
         try {
-            Socket clientSocket = new Socket(Facade.ip, 5000);
             SendMessages send = new SendMessages(clientSocket, "EXIT");
             ReceiveMessages receive = new ReceiveMessages(clientSocket);
 
@@ -44,66 +54,61 @@ public class Facade {
                 System.out.println("Not Connected");
             }
 
-            clientSocket.close();
-
             if (receive.reply.isEmpty()) {
-                return null;
+                return false;
             }
             else {
-                return receive.reply;
+                clientSocket.close();
+                return true;
             }
         }
         catch (Exception exception) {
             System.out.println("ERROR: " + exception);
         }
-        return null;
+        return false;
     }
 
-    public static void register() {
+    public static boolean register(Socket clientSocket) {
         //REGI
         try {
-            Socket clientSocket = new Socket(Facade.ip, 5000);
             SendMessages send = new SendMessages(clientSocket, "REGI");
+            ReceiveMessages receive = new ReceiveMessages(clientSocket);
+
+            if (clientSocket.isConnected()) {
+                send.start();
+                receive.run();
+            } else {
+                System.out.println("Not Connected");
+            }
+
+            if (receive.reply.isEmpty()) {
+                return false;
+            }
+            else {
+                Facade.id = receive.reply.substring(receive.reply.lastIndexOf(':') + 1);
+                Facade.id = Facade.id.replace("\n", "");
+                return true;
+            }
+        }
+        catch (Exception exception) {
+            System.out.println("ERROR: " + exception);
+        }
+        return false;
+    }
+
+    public static boolean buy(Socket clientSocket, String company, int Shares) {
+        try {
+            SendMessages send = new SendMessages(clientSocket, "BUY:" + company + ":" + String.valueOf(Shares) + ":" + Facade.id);
             ReceiveMessages receive = new ReceiveMessages(clientSocket);
 
             if (clientSocket.isConnected()) {
                 send.run();
                 receive.run();
             } else {
-                System.out.println("Not Connected");
+                System.out.println("Not Conneted");
             }
 
-            clientSocket.close();
-
-            if (receive.reply.isEmpty()) {
-                return;
-            }
-            else {
-                Facade.id = receive.reply.substring(receive.reply.lastIndexOf(':') + 1);
-            }
-        }
-        catch (Exception exception) {
-            System.out.println("ERROR: " + exception);
-        }
-        return;
-    }
-
-    public static Boolean buy(String company, int Shares) {
-        try {
-            Socket clientSocket = new Socket(Facade.ip, 5000);
-            SendMessages send = new SendMessages(clientSocket, "BUY:" + company + ":" + String.valueOf(Shares) + ":" + Facade.id);
-            ReceiveMessages receive = new ReceiveMessages(clientSocket, true);
-
-            if (clientSocket.isConnected()) {
-                send.run();
-                receive.run();
-            } else {
-                System.out.println("Not Connected");
-            }
-
-            clientSocket.close();
-
-            if (receive.reply.startsWith("ACK:BOUGHT")) {
+            if (!receive.reply.isEmpty()) {
                 System.out.println(receive.reply);
                 return true;
             }
@@ -114,14 +119,13 @@ public class Facade {
         catch (Exception exception) {
             System.out.println("ERROR: " + exception);
         }
-        return null;
+        return false;
     }
 
-    public static Boolean sell(String company, int Shares) {
+    public static Boolean sell(Socket clientSocket, String company, int Shares) {
         try {
-            Socket clientSocket = new Socket(Facade.ip, 5000);
-            SendMessages send = new SendMessages(clientSocket, "BUY:" + company + ":" + String.valueOf(Shares) + ":" + Facade.id);
-            ReceiveMessages receive = new ReceiveMessages(clientSocket, true);
+            SendMessages send = new SendMessages(clientSocket, "SELL:" + company + ":" + String.valueOf(Shares) + ":" + Facade.id);
+            ReceiveMessages receive = new ReceiveMessages(clientSocket);
 
             if (clientSocket.isConnected()) {
                 send.run();
@@ -129,8 +133,6 @@ public class Facade {
             } else {
                 System.out.println("Not Connected");
             }
-
-            clientSocket.close();
 
             if (receive.reply.startsWith("ACK:SELL")) {
                 System.out.println(receive.reply);
@@ -146,9 +148,8 @@ public class Facade {
         return null;
     }
 
-    public static String display() {
+    public static String display(Socket clientSocket) {
         try {
-            Socket clientSocket = new Socket(Facade.ip, 5000);
             SendMessages send = new SendMessages(clientSocket, "DISP:" + Facade.id);
             ReceiveMessages receive = new ReceiveMessages(clientSocket, true);
 
@@ -158,8 +159,6 @@ public class Facade {
             } else {
                 System.out.println("Not Connected");
             }
-
-            clientSocket.close();
             return receive.reply;
         }
         catch (Exception exception) {

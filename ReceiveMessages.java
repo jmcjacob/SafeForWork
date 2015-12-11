@@ -2,11 +2,12 @@ package com.company;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.*;
+import java.util.Arrays;
 
 public class ReceiveMessages extends Thread
 {
     private Socket s;
-    public String reply = "";
+    public String reply = "Reply: ";
     public boolean multiLine = false;
 
     public ReceiveMessages(Socket _Socket)
@@ -23,12 +24,25 @@ public class ReceiveMessages extends Thread
         try {
             BufferedReader response = new BufferedReader(new InputStreamReader(s.getInputStream()));
             if (!multiLine)
-                reply = "Reply: " + response.readLine() + "\n";
+                reply = reply + response.readLine() + "\n";
             else if(multiLine) {
-                do {
-                    reply = reply + "Reply: " + response.readLine() + "\n";
+                int value = 0;
+                String thing = "";
+                while ((value = response.read()) != -1) {
+                    if ((char)value == '\n') {
+                        String[] things = thing.split("\n");
+                        if (things.length > 1) {
+                            if (things[things.length-1].equals("END:EOF")) {
+                                reply = Arrays.copyOfRange(things,1,things.length-1).toString();
+                                return;
+                            }
+                        }
+                    }
+                    if ((char)value == '\r') {}
+                    else {
+                        thing = thing + (char) value;
+                    }
                 }
-                while(response.readLine().substring(0,3).equals("STK"));
             }
         }
 
