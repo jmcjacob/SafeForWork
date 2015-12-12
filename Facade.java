@@ -26,6 +26,7 @@ public class Facade {
             return false;
         }
         catch (Exception e) {
+            System.out.println(e);
             return false;
         }
     }
@@ -210,12 +211,15 @@ public class Facade {
                 System.out.println("Not Connected");
             }
             for (int i = 0; i < receive.replies.length; i++) {
-                String[] values = receive.replies[i].split(":");
-                stocks.add(new Stock(values[1], Double.valueOf(values[2]), Double.valueOf(values[3])));
+                if (receive.replies[i].startsWith("STK")) {
+                    String[] values = receive.replies[i].split(":");
+                    stocks.add(new Stock(values[1], Double.valueOf(values[2]), Double.valueOf(values[3])));
+                }
             }
         }
         catch (Exception exception) {
-            System.out.println("ERROR: " + exception);
+            System.out.println("ERRORget: " + exception);
+            exception.printStackTrace();
         }
         return true;
     }
@@ -232,16 +236,19 @@ public class Facade {
                 System.out.println("Not Connected");
             }
             for (int i = 0; i < receive.replies.length; i++) {
-                String[] values = receive.replies[i].split(":");
-                for (int j = 0; j > stocks.size(); j++) {
-                    if (stocks.get(j).getName().equals(values[0])) {
-                        stocks.set(j, new Stock(values[0], Double.valueOf(values[1]), Double.valueOf(values[2]), stocks.get(j).getOwned()));
+                if (receive.replies[i].startsWith("STK")) {
+                    String[] values = receive.replies[i].split(":");
+                    for (int j = 0; j < stocks.size(); j++) {
+                        if (stocks.get(j).getName().equals(values[1])) {
+                            stocks.set(j, new Stock(values[1], Double.valueOf(values[2]), Double.valueOf(values[3]), stocks.get(j).getOwned()));
+                            break;
+                        }
                     }
                 }
             }
         }
         catch (Exception exception) {
-            System.out.println("ERROR: " + exception);
+            System.out.println("ERRORupdate: " + exception);
         }
         return false;
     }
@@ -270,9 +277,9 @@ public class Facade {
     public static boolean autoCycle(Socket clientSocket) {
         update(clientSocket);
         int index = 0;
-        Double HighestChange = 0.0;
-        for (int i = 0; i > stocks.size(); i++) {
-            if (stocks.get(i).getChange() > HighestChange && stocks.get(i).getPrice() > 0.0) {
+        Double HighestChange = 10.0;
+        for (int i = 0; i < stocks.size()-1; i++) {
+            if (stocks.get(i).getChange() < HighestChange && stocks.get(i).getPrice() > 0.0) {
                 HighestChange = stocks.get(i).getChange();
                 index = i;
             }
@@ -285,11 +292,17 @@ public class Facade {
         String name = stocks.get(index).getName();
         boolean thing = true;
         while (thing) {
+            try {
+                Thread.sleep(5000);                 //1000 milliseconds is one second.
+            } catch(InterruptedException ex) {
+                Thread.currentThread().interrupt();
+            }
             Facade.update(clientSocket);
             if (price < stocks.get(index).getPrice()) {
                 Facade.sell(clientSocket, name, number);
                 thing = false;
             }
+            Facade.displayOwned();
         }
         Facade.displayMoney();
         Facade.displayOwned();
