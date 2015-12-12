@@ -274,38 +274,36 @@ public class Facade {
         return true;
     }
 
-    public static boolean autoCycle(Socket clientSocket) {
-        update(clientSocket);
-        int index = 0;
-        Double HighestChange = 10.0;
-        for (int i = 0; i < stocks.size()-1; i++) {
-            if (stocks.get(i).getChange() < HighestChange && stocks.get(i).getPrice() > 0.0) {
-                HighestChange = stocks.get(i).getChange();
-                index = i;
+    public static boolean autoCycle(Socket clientSocket, int cycles) {
+        for (int j = 0; j < cycles; j++) {
+            update(clientSocket);
+            int index = 0;
+            Double HighestChange = 10.0;
+            for (int i = 0; i < stocks.size() - 1; i++) {
+                if (stocks.get(i).getChange() < HighestChange && stocks.get(i).getPrice() > 0.0) {
+                    HighestChange = stocks.get(i).getChange();
+                    index = i;
+                }
             }
+            int number = (int) (long) (Facade.money / stocks.get(index).getPrice());
+            Facade.buy(clientSocket, stocks.get(index).getName(), number);
+            Double price = stocks.get(index).getPrice();
+            String name = stocks.get(index).getName();
+            boolean thing = true;
+            while (thing) {
+                try {
+                    Thread.sleep(5000);                 //1000 milliseconds is one second.
+                } catch (InterruptedException ex) {
+                    Thread.currentThread().interrupt();
+                }
+                Facade.update(clientSocket);
+                if (price < stocks.get(index).getPrice()) {
+                    Facade.sell(clientSocket, name, number);
+                    thing = false;
+                }
+            }
+            System.out.println(String.valueOf(j));
         }
-        int number = (int)(long)(Facade.money/stocks.get(index).getPrice());
-        Facade.buy(clientSocket, stocks.get(index).getName(), number);
-        Facade.displayMoney();
-        Facade.displayOwned();
-        Double price = stocks.get(index).getPrice();
-        String name = stocks.get(index).getName();
-        boolean thing = true;
-        while (thing) {
-            try {
-                Thread.sleep(5000);                 //1000 milliseconds is one second.
-            } catch(InterruptedException ex) {
-                Thread.currentThread().interrupt();
-            }
-            Facade.update(clientSocket);
-            if (price < stocks.get(index).getPrice()) {
-                Facade.sell(clientSocket, name, number);
-                thing = false;
-            }
-            Facade.displayOwned();
-        }
-        Facade.displayMoney();
-        Facade.displayOwned();
         return true;
     }
 }
