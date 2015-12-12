@@ -5,14 +5,14 @@ import java.io.IOException;
 
 public class UserInterface {
 
-    public static String menu(){
+    public static void menu(){
         String item1 = "Registered ID", item2 = "Display stock values",
                 item3 = "Display balance", item4 = "Display owned stocks",
                 item5 = "Buy stocks", item6 = "Sell stocks", item7 = "Exit";
 
         String company;
         Integer shares;
-        String option;
+        String option = "0";
 
         do { option =  prompt("What would you like to do?" + "\n1. " + item1 + "\t2. " + item2 +
                     "\t3. " + item3 + "\n4. " + item4 + "\t5. " + item5 + "\t6. " + item6 +
@@ -56,10 +56,13 @@ public class UserInterface {
                     break;
                 case "7": // Exit
                     Facade.exit(Facade.clientSocket);
+                    return;
+                default:
+                    System.out.println("Please only enter 1-7.");
                     break;
             }
         } while (option != "7");
-        return "";
+        return;
     }
 
     public static String prompt(String prompt){
