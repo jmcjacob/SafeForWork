@@ -394,7 +394,7 @@ public class Facade {
      * @param cycles Number of iterations to automate the buy and sell functions.
      * @return Boolean value to determine whether the cycles have completed successfully.
      * @see #buy(Socket, String, int)
-     * @see #sell(Socket, String, int) 
+     * @see #sell(Socket, String, int)
      */
     public static boolean autoCycle(Socket clientSocket, int cycles) {
         for (int j = 0; j < cycles; j++) {
