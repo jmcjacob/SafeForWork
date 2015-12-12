@@ -15,11 +15,12 @@ public class Facade {
     public static boolean initiate(String ip) {
         try {
             clientSocket = new Socket(ip, 5000);
-            Facade.addMoney((double)clientSocket.getLocalPort());
             if (Facade.test(clientSocket)) {
                 if (register(clientSocket)) {
                     if (get(clientSocket)) {
-                        return true;
+                        if (setMoney(clientSocket)) {
+                            return true;
+                        }
                     }
                 }
             }
@@ -29,19 +30,6 @@ public class Facade {
             System.out.println(e);
             return false;
         }
-    }
-
-    public static boolean addMoney(Double cash) {
-        money = money + cash;
-        return true;
-    }
-
-    public static boolean takeMoney(Double cash) {
-        if (money - cash >= 0.0) {
-            money = money - cash;
-            return true;
-        }
-        return false;
     }
 
     public static boolean test(Socket clientSocket) {
@@ -82,6 +70,33 @@ public class Facade {
             }
             else {
                 clientSocket.close();
+                return true;
+            }
+        }
+        catch (Exception exception) {
+            System.out.println("ERROR: " + exception);
+        }
+        return false;
+    }
+
+    public static boolean setMoney(Socket clientSocket) {
+        try {
+            SendMessages send = new SendMessages(clientSocket, "CASH:"+Facade.id);
+            ReceiveMessages receive = new ReceiveMessages(clientSocket);
+
+            if (clientSocket.isConnected()) {
+                send.start();
+                receive.run();
+            } else {
+                System.out.println("Not Connected");
+            }
+
+            if (receive.reply.isEmpty()) {
+                return false;
+            }
+            else {
+                String[] values = receive.reply.split(":");
+                money = Double.valueOf(values[2]);
                 return true;
             }
         }
@@ -145,8 +160,8 @@ public class Facade {
                     String[] things = receive.reply.split(":");
                     Double value = Double.valueOf(things[things.length-1]);
                     if (money - value >= 0.0) {
-                        takeMoney(value);
                         stocks.get(index).addOwned(Shares);
+                        setMoney(clientSocket);
                         return true;
                     }
                 } else {
@@ -183,11 +198,10 @@ public class Facade {
                 }
 
                 if (!receive.reply.isEmpty()) {
-                    String[] things = receive.reply.split(":");
-                    Double value = Double.valueOf(things[things.length-1]);
-                    addMoney(value);
-                    if (stocks.get(index).takeOwned(Shares))
+                    if (stocks.get(index).takeOwned(Shares)) {
+                        setMoney(clientSocket);
                         return true;
+                    }
                     return false;
                 } else {
                     return false;
@@ -254,24 +268,27 @@ public class Facade {
     }
 
     public static boolean display() {
+        System.out.println("Available Stocks: ");
         for (int i = 0; i < stocks.size(); i++) {
             System.out.println(stocks.get(i).getName()+":"+stocks.get(i).getPrice()+":"+stocks.get(i).getChange()+":"+stocks.get(i).getOwned());
         }
         return true;
     }
 
-    public static boolean displayMoney() {
-        System.out.println("Current Balance: " + NumberFormat.getCurrencyInstance(new Locale("en", "GB")).format(money));
-        return true;
+    public static String displayMoney() {
+        return NumberFormat.getCurrencyInstance(new Locale("en", "GB")).format(money);
     }
 
     public static boolean displayOwned() {
+        boolean owned = false;
+        System.out.println("Owned Stocks: ");
         for (int i = 0; i < stocks.size(); i++) {
             if (stocks.get(i).getOwned()>0) {
                 System.out.println(stocks.get(i).getName() + ":" + stocks.get(i).getPrice() + ":" + stocks.get(i).getChange() + ":" + stocks.get(i).getOwned());
+                owned = true;
             }
         }
-        return true;
+        return owned;
     }
 
     public static boolean autoCycle(Socket clientSocket, int cycles) {
@@ -280,8 +297,8 @@ public class Facade {
             int index = 0;
             Double HighestChange = 10.0;
             for (int i = 0; i < stocks.size() - 1; i++) {
-                if (stocks.get(i).getChange() < HighestChange && stocks.get(i).getPrice() > 0.0) {
-                    HighestChange = stocks.get(i).getChange();
+                if (stocks.get(i).getPrice() < HighestChange && stocks.get(i).getPrice() > 0.0 && stocks.get(i).getChange()>0.0) {
+                    HighestChange = stocks.get(i).getPrice();
                     index = i;
                 }
             }
@@ -302,7 +319,7 @@ public class Facade {
                     thing = false;
                 }
             }
-            System.out.println(String.valueOf(j));
+            System.out.println(String.valueOf("Cycle " +String.valueOf(j+1) + " out of " + String.valueOf(cycles)));
         }
         return true;
     }
