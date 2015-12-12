@@ -106,7 +106,6 @@ public class Facade {
                 return false;
             }
             else {
-                System.out.println(receive.reply);
                 Facade.id = receive.reply.substring(receive.reply.lastIndexOf(':') + 1);
                 Facade.id = Facade.id.replace("\n", "");
                 return true;
@@ -201,7 +200,6 @@ public class Facade {
 
     public static Boolean get(Socket clientSocket) {
         try {
-            System.out.println("ID: " + Facade.id);
             SendMessages send = new SendMessages(clientSocket, "DISP:" + Facade.id);
             ReceiveMessages receive = new ReceiveMessages(clientSocket, true);
 
@@ -266,6 +264,35 @@ public class Facade {
                 System.out.println(stocks.get(i).getName() + ":" + stocks.get(i).getPrice() + ":" + stocks.get(i).getChange() + ":" + stocks.get(i).getOwned());
             }
         }
+        return true;
+    }
+
+    public static boolean autoCycle(Socket clientSocket) {
+        update(clientSocket);
+        int index = 0;
+        Double HighestChange = 0.0;
+        for (int i = 0; i > stocks.size(); i++) {
+            if (stocks.get(i).getChange() > HighestChange && stocks.get(i).getPrice() > 0.0) {
+                HighestChange = stocks.get(i).getChange();
+                index = i;
+            }
+        }
+        int number = (int)(long)(Facade.money/stocks.get(index).getPrice());
+        Facade.buy(clientSocket, stocks.get(index).getName(), number);
+        Facade.displayMoney();
+        Facade.displayOwned();
+        Double price = stocks.get(index).getPrice();
+        String name = stocks.get(index).getName();
+        boolean thing = true;
+        while (thing) {
+            Facade.update(clientSocket);
+            if (price < stocks.get(index).getPrice()) {
+                Facade.sell(clientSocket, name, number);
+                thing = false;
+            }
+        }
+        Facade.displayMoney();
+        Facade.displayOwned();
         return true;
     }
 }
