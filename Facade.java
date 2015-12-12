@@ -5,13 +5,29 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+/**
+ * Facade class, based on design patterns for simplifying the User Experience.
+ * @see #clientSocket
+ * @see #id
+ * @see #money
+ * @see Stock
+ */
 public class Facade {
 
+    /** String id, stores the returned registration id from the REGI server command.*/
     static String id = null;
+    /** Socket clientSocket, stores socket information for the program to access.*/
     static Socket clientSocket;
+    /** Local reference of the amount of money the User.*/
     static Double money = 0.0;
+    /** Stores a list of the latest stocks, its price and difference.*/
     static List<Stock> stocks = new ArrayList<Stock>();
 
+    /**
+     * Method: initiate, takes an IP address as a string and sets up the clients connection to the server.
+     * @param ip IP address of the Stocks Server to connect to.
+     * @return Boolean value to determine whether initiation was successful.
+    */
     public static boolean initiate(String ip) {
         try {
             clientSocket = new Socket(ip, 5000);
@@ -32,6 +48,12 @@ public class Facade {
         }
     }
 
+    /**
+     * Method: test, ensures a connection is established between the client and server by
+     * sending "HELO" and reading a response.
+     * @param clientSocket This is the socket the client communicates with the server through.
+     * @return Boolean value to determine whether test "HELO" command was successful.
+     */
     public static boolean test(Socket clientSocket) {
         try {
             SendMessages send = new SendMessages(clientSocket, "HELO");
@@ -53,6 +75,11 @@ public class Facade {
         return false;
     }
 
+    /**
+     * Method: exit, this method cleanly drops the connection to the server.
+     * @param clientSocket This is the socket the client communicates with the server through.
+     * @return Boolean value to determine whether the connection was closed successfully.
+     */
     public static boolean exit(Socket clientSocket) {
         try {
             SendMessages send = new SendMessages(clientSocket, "EXIT");
@@ -79,6 +106,11 @@ public class Facade {
         return false;
     }
 
+    /**
+     * Method: setMoney, this method sets the amount of money locally to the amount the server has allocated.
+     * @param clientSocket This is the socket the client communicates with the server through.
+     * @return Boolean value to determine whether the money was set correctly.
+     */
     public static boolean setMoney(Socket clientSocket) {
         try {
             SendMessages send = new SendMessages(clientSocket, "CASH:"+Facade.id);
@@ -106,6 +138,18 @@ public class Facade {
         return false;
     }
 
+    /**
+     * Method: register, this method sends the "REGI" command to the server to retrieve a
+     * unique identifier for this clients connection. This identifier is used in other methods such as
+     * Buy and Sell as the server requires any transaction to be authorised.
+     * @param clientSocket This is the socket the client communicates with the server through.
+     * @return Boolean value to determine whether the client has registered successfully.
+     * @see #buy(Socket, String, int)
+     * @see #sell(Socket, String, int)
+     * @see #display()
+     * @see #setMoney(Socket)
+     * @see #update(Socket)
+     */
     public static boolean register(Socket clientSocket) {
         try {
             SendMessages send = new SendMessages(clientSocket, "REGI");
@@ -133,6 +177,16 @@ public class Facade {
         return false;
     }
 
+    /**
+     * Method: buy, this method will ensure the local stocks list is up to date, there is sufficient funds
+     * to buy the specified stocks and then complete the action and store the owned stocks locally.
+     * @param clientSocket This is the socket the client communicates with the server through.
+     * @param company This represents the company name of the stocks.
+     * @param Shares Number of shares involved in the transaction.
+     * @return Boolean value to determine whether the purchase has completed successfully.
+     * @see #stocks
+     * @see #update(Socket)
+     */
     public static boolean buy(Socket clientSocket, String company, int Shares) {
         Facade.update(clientSocket);
         boolean comp = false;
@@ -174,6 +228,18 @@ public class Facade {
         return false;
     }
 
+    /**
+     * Method: sell, this method will check that the specified stocks and amount are actually owned by
+     * the client and then update the current local values of all stocks and proceed with the transaction.
+     * @param clientSocket This is the socket the client communicates with the server through.
+     * @param company This represents the company name of the stocks.
+     * @param Shares Number of shares involved in the transaction.
+     * @return Boolean value to determine whether the transaction has completed successfully.
+     * @see #stocks
+     * @see #update(Socket)
+     * @see #money
+     * @see #setMoney(Socket)
+     */
     public static boolean sell(Socket clientSocket, String company, int Shares) {
         Facade.update(clientSocket);
         boolean comp = false;
@@ -213,6 +279,15 @@ public class Facade {
         return false;
     }
 
+    /**
+     * Method: get, this method will initialise the list of stocks with the first values read by the client.
+     * after this method, {@link #update(Socket)}, the Update method will handle the continued updated stock
+     * information.
+     * @param clientSocket This is the socket the client communicates with the server through.
+     * @return Boolean value to determine whether the initial stock values have been retrieved.
+     * @see #update(Socket)
+     * @see #stocks
+     */
     public static Boolean get(Socket clientSocket) {
         try {
             SendMessages send = new SendMessages(clientSocket, "DISP:" + Facade.id);
@@ -238,6 +313,14 @@ public class Facade {
         return true;
     }
 
+    /**
+     * Method: update, will continually be called throughout the running of the Facade operations to ensure
+     * that the client is performing calculations on the most up to date stocks from the server.
+     * @param clientSocket This is the socket the client communicates with the server through.
+     * @return Boolean value to determine whether the stocks have been updated successfully.
+     * @see #stocks
+     * @see Stock
+     */
     public static Boolean update(Socket clientSocket) {
         try {
             SendMessages send = new SendMessages(clientSocket, "DISP:" + Facade.id);
@@ -267,6 +350,10 @@ public class Facade {
         return false;
     }
 
+    /**
+     * Method: display, this method will display the stock information that is stored locally.
+     * @return Boolean value to determine whether the stocks have been updated successfully.
+     */
     public static boolean display() {
         System.out.println("Available Stocks: ");
         for (int i = 0; i < stocks.size(); i++) {
@@ -275,10 +362,19 @@ public class Facade {
         return true;
     }
 
+    /**
+     * Method: displayMoney, displays the amount of money the client has.
+     * @return value of the Money currently owned.
+     * @see #money
+     */
     public static String displayMoney() {
         return NumberFormat.getCurrencyInstance(new Locale("en", "GB")).format(money);
     }
 
+    /**
+     * Method: displayOwned, shows the user what stocks are owned by the client.
+     * @return Boolean value to determine whether the owned stock has been displayed.
+     */
     public static boolean displayOwned() {
         boolean owned = false;
         System.out.println("Owned Stocks: ");
@@ -291,6 +387,15 @@ public class Facade {
         return owned;
     }
 
+    /**
+     * Method: autoCycle, automates the buy and sell functionality of the facade. This method aims to
+     * be continually profitable and then displays the sum of profits to the user.
+     * @param clientSocket This is the socket the client communicates with the server through.
+     * @param cycles Number of iterations to automate the buy and sell functions.
+     * @return Boolean value to determine whether the cycles have completed successfully.
+     * @see #buy(Socket, String, int)
+     * @see #sell(Socket, String, int) 
+     */
     public static boolean autoCycle(Socket clientSocket, int cycles) {
         for (int j = 0; j < cycles; j++) {
             update(clientSocket);

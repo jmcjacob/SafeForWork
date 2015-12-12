@@ -1,3 +1,7 @@
 *
 !*/
 !*.java
+!*.html
+!*.file
+!*.js
+!*.css

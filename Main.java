@@ -4,8 +4,10 @@ import java.text.NumberFormat;
 import java.util.Locale;
 import java.util.Scanner;
 
+// Main class of entry
 public class Main {
 
+    // Main entry method.
     public static void main(String[] args) {
         try {
             Scanner scanner = new Scanner(System.in);
