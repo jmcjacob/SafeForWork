@@ -14,6 +14,7 @@ public class Main {
             while (true) {
                 System.out.println("Enter Stock Market IP Address: ");
                 if (Facade.initiate(scanner.nextLine())) {
+                    Double first = Facade.money;
                     System.out.println("You have " + Facade.displayMoney() + " in your balance.");
                     while (true) {
                         System.out.println("What would you like to do?");
@@ -38,26 +39,43 @@ public class Main {
                         }
 
                         else if (command.equals("display") || command.equals("Display") || command.equals("DISPLAY")) {
+                            loop:
                             while (true) {
                                 System.out.println("What do you want to display?");
                                 String response = scanner.nextLine();
-                                if (response.equals("stocks") || response.equals("Stocks") || response.equals("STOCKS")) {
+                                if (response.equals("stock") || response.equals("Stock") || response.equals("STOCK")) {
+                                    while (true) {
+                                        System.out.println("Which company would you like to see?");
+                                        response = scanner.nextLine();
+                                        if (response.equals("exit") || response.equals("Exit") || response.equals("EXIT")) { break loop; }
+                                        for (int i = 0; i < Facade.stocks.size(); i++) {
+                                            if (Facade.stocks.get(i).getName().equals(response)) {
+                                                System.out.println(Facade.stocks.get(i).getName() + ":" + Facade.stocks.get(i).getPrice() + ":" + Facade.stocks.get(i).getChange() + ":" + Facade.stocks.get(i).getOwned());
+                                                break loop;
+                                            }
+                                        }
+                                        System.out.println("Please enter a valid company or type \"EXIT\" to exit.");
+                                    }
+                                } else if (response.equals("stocks") || response.equals("Stocks") || response.equals("STOCKS")) {
                                     Facade.display();
                                     break;
-                                }
-                                else if (response.equals("owned") || response.equals("Owned") || response.equals("OWNED")) {
+                                } else if (response.equals("owned") || response.equals("Owned") || response.equals("OWNED")) {
                                     Facade.displayOwned();
                                     break;
-                                }
-                                else if (response.equals("money") || response.equals("Money") || response.equals("MONEY")) {
-                                    System.out.println(Facade.displayMoney());
+                                } else if (response.equals("money") || response.equals("Money") || response.equals("MONEY")) {
+                                    System.out.println("Current Balance: " + Facade.displayMoney());
                                     break;
-                                }
-                                else if (response.equals("help") || response.equals("HELP") || response.equals("Help")) {
+                                } else if (response.equals("profit") || response.equals("Profit") || response.equals("PROFIT")) {
+                                    System.out.println("Current Profit " + NumberFormat.getCurrencyInstance(new Locale("en", "GB")).format(Facade.money - first));
+                                    break;
+                                } else if (response.equals("help") || response.equals("HELP") || response.equals("Help")) {
+                                    System.out.println("STOCK - Display a stock.");
                                     System.out.println("STOCKS - Displays all current stock information.");
                                     System.out.println("OWNED - Displays all currently owned stocks.");
                                     System.out.println("MONEY - Displays current balance.");
-                                }
+                                    System.out.println("PROFIT - Displays current profit.");
+                                    System.out.println("EXIT - Exits the display.");
+                                } else if (response.equals("exit") || response.equals("Exit") || response.equals("EXIT")) { break; }
                                 else {
                                     System.out.println("Please enter a valid command or enter \"Help\"");
                                 }
